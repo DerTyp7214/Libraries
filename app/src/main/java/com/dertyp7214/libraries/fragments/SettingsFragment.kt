@@ -1,15 +1,15 @@
 package com.dertyp7214.libraries.fragments
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.dertyp7214.libraries.R
+import com.dertyp7214.libraries.screens.FragmentScreen
 
 @SuppressLint("ValidFragment")
-class SettingsFragment(c: Context) : BaseFragment(c) {
+class SettingsFragment(c: FragmentScreen) : BaseFragment(c) {
 
     init {
         name = c.getString(R.string.title_settings)
