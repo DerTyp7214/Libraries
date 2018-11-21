@@ -2,6 +2,7 @@ package com.dertyp7214.libraries.screens
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -71,11 +72,17 @@ class MainActivity(root: Root) : FragmentScreen(root) {
             }
         })
 
-        val themeManager = ThemeManager.getInstance(activity)
-
-        themeManager.enableStatusAndNavBar(activity)
-
         return view
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        try {
+            viewPagerAdapter.fragmentList.forEach {
+                it.onAttach(context)
+            }
+        } catch (e: Exception) {
+        }
     }
 
     private fun setUpBottomNavView() {

@@ -3,11 +3,13 @@ package com.dertyp7214.libraries
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
+import android.util.DisplayMetrics
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
+import com.dertyp7214.libraries.components.ViewPagerCustomDuration
 import com.dertyp7214.libraries.logs.Logger
 import com.dertyp7214.libraries.screens.FragmentScreen
 import com.dertyp7214.libraries.screens.MainActivity
@@ -17,18 +19,25 @@ import kotlinx.android.synthetic.main.activity_root.*
 
 
 
+
 class Root : FragmentActivity() {
 
-    private lateinit var viewPager: ViewPager
+    private lateinit var viewPager: ViewPagerCustomDuration
     private lateinit var viewPagerAdapter: ViewPagerAdapter
     private lateinit var logger: Logger
     private lateinit var themeManager: ThemeManager
+    private var width: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_root)
 
         themeManager = ThemeManager.getInstance(this)
+        themeManager.enableStatusAndNavBar(this)
+
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        width = displayMetrics.widthPixels
 
         logger = Logger(this)
         viewPager = findViewById(R.id.viewPager)
@@ -37,10 +46,13 @@ class Root : FragmentActivity() {
         viewPager.setPageTransformer(true, SlidePageTransformer())
         viewPager.isSaveFromParentEnabled = false
         viewPager.adapter = viewPagerAdapter
+        viewPager.setScrollDurationFactor(2.toDouble())
 
         viewPagerAdapter.addFragment(MainActivity(this, Color.parseColor("#88FF88")))
 
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            var lastPos = -1F
+
             override fun onPageScrollStateChanged(state: Int) {
             }
 
@@ -64,18 +76,13 @@ class Root : FragmentActivity() {
                         }
                     }
                 }
+                if (position == viewPagerAdapter.fragmentList.lastIndex - 1 && positionOffset == 0F && positionOffset < lastPos && lastPos < 0.5F) {
+                    close(viewPagerAdapter.fragmentList.last())
+                }
+                lastPos = positionOffset
             }
 
             override fun onPageSelected(position: Int) {
-                try {
-                    if (position == viewPagerAdapter.fragmentList.lastIndex - 1) {
-                        Handler().postDelayed({
-                            viewPagerAdapter.remove(viewPagerAdapter.fragmentList.last())
-                        }, 300)
-                    }
-                } catch (e: Exception) {
-                    logger.logD("swipeBack", e)
-                }
             }
         })
     }
